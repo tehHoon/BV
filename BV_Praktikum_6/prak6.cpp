@@ -52,9 +52,9 @@ void prak6::printMat(cv::Mat src){
 }
 
 void prak6::imgshow(cv::Mat src, int width, int height, int posX, int posY, std::string winName){
-    namedWindow(winName, CV_WINDOW_FREERATIO);
-    resizeWindow(winName, width, height);
-    moveWindow(winName, posX, posY);
+    cv::namedWindow(winName, CV_WINDOW_FREERATIO);
+    cv::resizeWindow(winName, width, height);
+    cv::moveWindow(winName, posX, posY);
     imshow(winName, src);
 }
 /* Hilfsfunktionen Ende */
@@ -63,27 +63,28 @@ void prak6::imgshow(cv::Mat src, int width, int height, int posX, int posY, std:
 void prak6::getBackgroundImage(cv::Mat src){
     //grayscale floats
     this->src = src;
-    Mat background, original;
+    cv::Mat background, original;
     cvtColor(src, imgGray, CV_BGR2GRAY);
     imgGray.convertTo(background, CV_32F);
     imgGray.convertTo(original, CV_32F);
-    normalize(background, background, 0, 1, NORM_MINMAX);
+    //normalize(background, background, 0, 1, NORM_MINMAX);
 
     //kernel erstellen und hintergrund filtern
-    Mat kernel = getStructuringElement(CV_SHAPE_ELLIPSE, Size(23,23));
-    morphologyEx(background, background, MORPH_OPEN, kernel);
-    morphologyEx(background, background, MORPH_CLOSE, kernel);
-
-    imgshow(background, 640, 490, 0, 0, "Hintergrund");
-    resultBackground = background;
-
+    cv::Mat kernel = getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(23,23));
+    //morphologyEx(background, background, MORPH_OPEN, kernel);
+    cv::morphologyEx(background, background, cv::MORPH_CLOSE, kernel);
 
     //Subtraktion mit Hintergrund
     //Mat sub = original - filtered;
-    Mat sub(src.rows, src.cols, CV_32F);
-    cv::subtract(original, background, sub, Mat());
-    normalize(sub, sub, 0, 1, NORM_MINMAX);
+    cv::Mat sub(src.rows, src.cols, CV_32F);
+    //normalize(background, background, 0, 255, NORM_MINMAX);
+    cv::subtract(original, background, sub, cv::Mat());
 
+    cv::normalize(background, background, 0, 1, cv::NORM_MINMAX);
+    imgshow(background, 640, 490, 0, 0, "Hintergrund");
+    resultBackground = background;
+
+    cv::normalize(sub, sub, 0, 1, cv::NORM_MINMAX);
     imgshow(sub, 640, 490, 640, 0, "Subtraktion mit Hintergrund");
     resultSubtraction = sub;
 }
@@ -99,8 +100,8 @@ void prak6::setBThreshMax(double max){
 void prak6::binaryImage(){
     cv::Mat bImg;
 
-    Mat sub;
-    normalize(resultSubtraction, sub, 0, 255, NORM_MINMAX);
+    cv::Mat sub;
+    cv::normalize(resultSubtraction, sub, 0, 255, cv::NORM_MINMAX);
     sub.convertTo(sub, CV_8U);
 
     threshold(sub, bImg, bThreshMin, bThreshMax, 0);
@@ -110,29 +111,29 @@ void prak6::binaryImage(){
 }
 
 void prak6::Opening(){
-    Mat kernel = getStructuringElement(CV_SHAPE_RECT, Size(3,3));
+    cv::Mat kernel = getStructuringElement(cv::MORPH_RECT, cv::Size(3,3));
 
-    Mat bImg = resultBinary;
-    morphologyEx(bImg, bImg, MORPH_OPEN, kernel);
+    cv::Mat bImg = resultBinary;
+    cv::morphologyEx(bImg, bImg, cv::MORPH_OPEN, kernel);
 
     imgshow(bImg, 640, 490, 0, 522, "Opening");
     resultOpening = bImg;
 }
 
 void prak6::Closing(){
-    Mat kernel = getStructuringElement(CV_SHAPE_ELLIPSE, Size(4,4));
+    cv::Mat kernel = getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3,3));
 
-    Mat bImg = resultOpening;
-    morphologyEx(bImg, bImg, MORPH_CLOSE, kernel);
+    cv::Mat bImg = resultOpening;
+    cv::morphologyEx(bImg, bImg, cv::MORPH_CLOSE, kernel);
 
     imgshow(bImg, 640, 490, 640, 522, "Closing");
     resultClosing = bImg;
 }
 
 void prak6::Overlap(){
-    Mat binInverted;
-    bitwise_not(resultClosing, binInverted);
-    Mat overlap = binInverted + imgGray;
+    cv::Mat binInverted;
+    cv::bitwise_not(resultClosing, binInverted);
+    cv::Mat overlap = binInverted + imgGray;
 
     imgshow(overlap, 640, 490, 1280, 522, "Ueberlagerung");
     resultOverlapping = overlap;

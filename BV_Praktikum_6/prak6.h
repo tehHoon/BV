@@ -4,15 +4,15 @@
 #include <opencv2/opencv.hpp>
 #include <QtMath>
 #include <string.h>
+#include <iostream>
 
-using namespace cv;
 class prak6
 {
 private:
-    double bThreshMin = 150.0;
+    double bThreshMin = 190.0;
     double bThreshMax = 255.0;
 
-    Mat src, imgGray,
+    cv::Mat src, imgGray,
         resultBackground,
         resultSubtraction,
         resultBinary,

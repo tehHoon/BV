@@ -40,42 +40,52 @@ void MainWindow::on_pb_load_clicked()
 
 void MainWindow::on_pbHintergrund_clicked()
 {
-    p->getBackgroundImage(img);
+    if(!img.empty())
+        p->getBackgroundImage(img);
 }
 
 void MainWindow::on_pb_Binaer_clicked()
 {
-    p->binaryImage();
+    if(!img.empty())
+        p->binaryImage();
 }
 
 void MainWindow::on_dsb_threshMax_valueChanged(double arg1)
 {
-    p->setBThreshMax(arg1);
-    on_pb_Binaer_clicked();
+    if(!img.empty()){
+        p->setBThreshMax(arg1);
+        on_pb_Binaer_clicked();
+    }
 }
 
 void MainWindow::on_dsb_threshMin_valueChanged(double arg1)
 {
-    p->setBThreshMin(arg1);
-    on_pb_Binaer_clicked();
+    if(!img.empty()){
+        p->setBThreshMin(arg1);
+        on_pb_Binaer_clicked();
+    }
 }
 
 void MainWindow::on_pbOpening_clicked()
 {
-    p->Opening();
+    if(!img.empty())
+        p->Opening();
 }
 
 void MainWindow::on_pbClosing_clicked()
 {
-    p->Closing();
+    if(!img.empty())
+        p->Closing();
 }
 
 void MainWindow::on_pbUeberlagern_clicked()
 {
-    p->Overlap();
+    if(!img.empty())
+        p->Overlap();
 }
 
 void MainWindow::on_pb_AIO_clicked()
 {
-    p->printAllResults(img);
+    if(!img.empty())
+        p->printAllResults(img);
 }
